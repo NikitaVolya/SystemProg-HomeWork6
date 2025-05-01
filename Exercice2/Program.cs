@@ -16,6 +16,16 @@
 
         static List<Airplane> Airplanes = new List<Airplane>();
 
+        static bool AllAirplanesFinished()
+        {
+            foreach (var airplane in Airplanes)
+            {
+                if (airplane.X < Width && airplane.Y < Height && airplane.X >= 0 && airplane.Y >= 0)
+                    return false;
+            }
+            return true;
+        }
+
         static void UpdateField()
         {
             if (1 < TargetProcent)
@@ -71,7 +81,6 @@
                     if (airplane.X >= Width || airplane.Y >= Height || airplane.X < 0 || airplane.Y < 0)
                         break;
                     DetectedField[airplane.Y, airplane.X] = Field[airplane.Y, airplane.X];
-                    PrintField();
                     airplane.Move();
                 }
                 Thread.Sleep(500);
@@ -87,6 +96,23 @@
                 );
 
 
+
+            Task display_task = Task.Run(() =>
+            {
+                while (true)
+                {
+                    lock (locker)
+                    {
+                        PrintField();
+                        if (AllAirplanesFinished())
+                        {
+                            Console.WriteLine("All airplanes finished their work.");
+                            break;
+                        }
+                    }
+                    Thread.Sleep(500);
+                }
+            });
             List<Task> airplanes_work = new List<Task>();
             for (int i = 0; i < AirplaneNumber; i++)
             {
@@ -100,11 +126,11 @@
                  );
             };
 
+            display_task.Wait();
             foreach (var airplane in airplanes_work)
             {
                 airplane.Wait();
             }
-            PrintField();
 
         }
     }
