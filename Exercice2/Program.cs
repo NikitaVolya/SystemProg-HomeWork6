@@ -9,7 +9,7 @@
         static int Height = 15;
         static int Width = 15;
         static float TargetProcent = 0.5f;
-        static int AirplaneNumber = 20;
+        static int AirplaneNumber = 30;
 
         static bool[,] Field = new bool[Height, Width];
         static bool[,] DetectedField = new bool[Height, Width];
@@ -72,6 +72,30 @@
             }
         }
 
+        static void FinalPrintField()
+        {
+            int detected_count = 0;
+            Console.Clear();
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if (Field[y, x] && DetectedField[y, x])
+                    { 
+                        Console.Write("X ");
+                        detected_count++;
+                    }
+                    else if (Field[y, x])
+                        Console.Write("o ");
+                    else
+                        Console.Write(". ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine($"Detected {detected_count} targets out of {(int)(Height * Width * TargetProcent)}.");
+            Console.WriteLine($"{detected_count / (float)(Height * Width * TargetProcent) * 100}% of targets.");
+        }
+
         static void AirplaneWork(Airplane airplane)
         {
             while (true)
@@ -106,7 +130,6 @@
                         PrintField();
                         if (AllAirplanesFinished())
                         {
-                            Console.WriteLine("All airplanes finished their work.");
                             break;
                         }
                     }
@@ -131,6 +154,9 @@
             {
                 airplane.Wait();
             }
+
+            FinalPrintField();
+            Console.WriteLine("All airplanes finished their work.");
 
         }
     }
