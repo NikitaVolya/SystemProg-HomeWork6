@@ -5,15 +5,15 @@
         static int GoldSum = 0;
         static Random random = new Random();
 
+        static object _locker = new object();
+
         static void UnitWork(string unit_name)
         {
-            int current_gold = 0;
             while (true)
             {
                 Console.WriteLine($"Unit {unit_name}: Working...");
                 Thread.Sleep(2000);
                 Console.WriteLine($"Unit {unit_name}: Received 30 gold...");
-                current_gold = 30;
 
                 Console.WriteLine($"Unit {unit_name}: Going to the base...");
 
@@ -21,8 +21,8 @@
 
 
                 Console.WriteLine($"Unit {unit_name}: Arrived at the base...");
-                GoldSum += current_gold;
-                current_gold = 0;
+                lock ( _locker)
+                    GoldSum += 30;
                 Console.WriteLine($"Unit {unit_name}: Total gold in the base: {GoldSum}");
                 Thread.Sleep(random.Next(6000, 10000));
             }
